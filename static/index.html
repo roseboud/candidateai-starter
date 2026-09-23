@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ask about {{NAME}}</title>
+    <meta name="description" content="An AI assistant that answers questions about {{NAME}} from their resume.">
+    <meta name="theme-color" content="#f6f1e7">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Archivo:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+    <style>
+        :root {
+            --paper: #f6f1e7;
+            --paper-deep: #ede4d2;
+            --cheek: #fffdf8;
+            --flank: #b39a6b;
+            --ink: #17130c;
+            --ink-70: rgba(23, 19, 12, 0.76);
+            --ink-55: rgba(23, 19, 12, 0.62);
+            --rule: rgba(23, 19, 12, 0.16);
+            --rule-strong: rgba(23, 19, 12, 0.55);
+            --error: #8f2d1f;
+            --display: 'Libre Caslon Display', Georgia, serif;
+            --body: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+            --mono: 'IBM Plex Mono', Consolas, monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { color-scheme: light; }
+
+        body {
+            font-family: var(--body);
+            font-size: 1.0625rem;
+            line-height: 1.65;
+            color: var(--ink);
+            background: var(--paper);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+        .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+        main {
+            width: 100%;
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 72px 24px 48px;
+            flex: 1;
+        }
+
+        .kicker {
+            font-family: var(--mono);
+            font-size: 0.74rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--ink-55);
+        }
+
+        .wingbar { display: block; position: relative; width: 60px; height: 7px; margin: 14px 0 18px; }
+        .wingbar::before, .wingbar::after { content: ''; position: absolute; left: 0; height: 1px; background: var(--flank); }
+        .wingbar::before { top: 0; width: 60px; }
+        .wingbar::after { top: 6px; width: 34px; }
+
+        h1 {
+            font-family: var(--display);
+            font-weight: 400;
+            font-size: clamp(2.2rem, 5vw, 3.2rem);
+            line-height: 1.08;
+        }
+
+        .lede { margin-top: 16px; color: var(--ink-70); max-width: 34em; }
+
+        .log { margin-top: 40px; border-top: 1px solid var(--rule-strong); }
+
+        .entry { padding: 22px 0; border-bottom: 1px solid var(--rule); }
+
+        .entry .q {
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            letter-spacing: 0.04em;
+            color: var(--ink-55);
+            margin-bottom: 8px;
+        }
+
+        .entry .q::before { content: 'Q · '; }
+
+        .entry .a { white-space: pre-line; max-width: 36em; }
+        .entry .a.pending { color: var(--ink-55); font-style: italic; }
+        .entry .a.error { color: var(--error); }
+
+        details { margin-top: 12px; }
+
+        summary {
+            cursor: pointer;
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--ink-55);
+            list-style: none;
+        }
+
+        summary::-webkit-details-marker { display: none; }
+        summary::before { content: '+ '; }
+        details[open] summary::before { content: '\2212  '; }
+
+        .sources { list-style: none; margin-top: 10px; }
+
+        .sources li {
+            font-size: 0.9rem;
+            color: var(--ink-70);
+            padding: 8px 0 8px 14px;
+            border-left: 1px solid var(--flank);
+            margin-bottom: 6px;
+        }
+
+        .sources .src {
+            display: block;
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            color: var(--ink-55);
+        }
+
+        form {
+            display: flex;
+            gap: 0;
+            margin-top: 28px;
+            border: 1px solid var(--rule-strong);
+            background: var(--cheek);
+            box-shadow: 6px 6px 0 var(--paper-deep);
+        }
+
+        input {
+            flex: 1;
+            min-width: 0;
+            font: inherit;
+            color: var(--ink);
+            background: transparent;
+            border: 0;
+            padding: 14px 16px;
+        }
+
+        input:focus { outline: none; }
+        form:focus-within { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+        button {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        form button {
+            border: 0;
+            border-left: 1px solid var(--rule-strong);
+            background: var(--ink);
+            color: var(--paper);
+            padding: 0 22px;
+        }
+
+        form button:disabled { opacity: 0.55; cursor: wait; }
+
+        .starters { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 22px; }
+
+        .starters button {
+            background: none;
+            border: 0;
+            border-bottom: 1px solid var(--rule-strong);
+            padding: 0 0 3px;
+            color: var(--ink);
+            text-align: left;
+            text-transform: none;
+            letter-spacing: 0.02em;
+        }
+
+        .starters button:hover { border-bottom: 2px solid var(--ink); }
+
+        footer {
+            border-top: 1px solid var(--rule);
+            padding: 22px 24px 28px;
+            text-align: center;
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.06em;
+            color: var(--ink-55);
+        }
+
+        footer a { color: var(--ink); }
+
+        @media (max-width: 480px) {
+            main { padding: 48px 18px 36px; }
+            form button { padding: 0 16px; }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <span class="kicker">Candidate assistant</span>
+        <span class="wingbar" aria-hidden="true"></span>
+        <h1>Ask about {{NAME}}</h1>
+        <p class="lede">This assistant answers from {{NAME}}'s resume and a short profile they wrote. It can be wrong, so confirm anything important with {{NAME}} directly.</p>
+
+        <div class="log" id="log" aria-live="polite"></div>
+
+        <form id="ask-form">
+            <label class="sr" for="q">Your question</label>
+            <input id="q" name="q" maxlength="500" autocomplete="off" placeholder="What experience do they have with data?">
+            <button type="submit">Ask</button>
+        </form>
+
+        <div class="starters" aria-label="Example questions">
+            <button type="button">What kind of role are they looking for?</button>
+            <button type="button">What did they do in their most recent job?</button>
+            <button type="button">What are they still learning?</button>
+        </div>
+    </main>
+
+    <footer>
+        Built at Saint Mary's University in a <a href="https://quinan.tech">Quinan Labs</a> workshop · Answers come from an AI model
+    </footer>
+
+    <script>
+        const log = document.getElementById('log');
+        const form = document.getElementById('ask-form');
+        const input = document.getElementById('q');
+        const askButton = form.querySelector('button');
+
+        // Add a question and a placeholder answer to the page. textContent (not innerHTML)
+        // means anything the model writes is shown as text and can never run as code.
+        function addEntry(question) {
+            const entry = document.createElement('article');
+            entry.className = 'entry';
+            const q = document.createElement('p');
+            q.className = 'q';
+            q.textContent = question;
+            const a = document.createElement('p');
+            a.className = 'a pending';
+            a.textContent = 'Reading the documents...';
+            entry.append(q, a);
+            log.append(entry);
+            entry.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            return a;
+        }
+
+        // Show which chunks the search step picked, so you can check where an answer came from
+        function showSources(entry, sources) {
+            const details = document.createElement('details');
+            const summary = document.createElement('summary');
+            summary.textContent = 'Sources · ' + sources.length + ' passages';
+            const list = document.createElement('ul');
+            list.className = 'sources';
+            sources.forEach(function (s) {
+                const li = document.createElement('li');
+                const src = document.createElement('span');
+                src.className = 'src';
+                src.textContent = s.source + ' · score ' + s.score;
+                li.append(src, s.text + (s.text.length >= 180 ? '...' : ''));
+                list.append(li);
+            });
+            details.append(summary, list);
+            entry.append(details);
+        }
+
+        async function ask(question) {
+            const answer = addEntry(question);
+            askButton.disabled = true;
+            try {
+                const response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: question })
+                });
+                let data = null;
+                try { data = await response.json(); } catch (e) { /* not JSON, handled below */ }
+
+                if (!response.ok || !data) {
+                    throw new Error(data && typeof data.detail === 'string'
+                        ? data.detail
+                        : 'The server did not answer. Free servers sleep when idle and take about a minute to wake. Try again shortly.');
+                }
+                answer.textContent = data.answer;
+                answer.classList.remove('pending');
+                if (data.sources && data.sources.length) showSources(answer.parentElement, data.sources);
+            } catch (error) {
+                answer.textContent = error.message.startsWith('Failed to fetch')
+                    ? 'Could not reach the server. Check your connection and try again.'
+                    : error.message;
+                answer.className = 'a error';
+            } finally {
+                askButton.disabled = false;
+                input.focus();
+            }
+        }
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const question = input.value.trim();
+            if (!question || askButton.disabled) return;
+            input.value = '';
+            ask(question);
+        });
+
+        document.querySelectorAll('.starters button').forEach(function (button) {
+            button.addEventListener('click', function () {
+                if (!askButton.disabled) ask(button.textContent);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+Jordan Doucette
+Bachelor of Commerce student, Marketing and Business Analytics
+Halifax, Nova Scotia · jordan.doucette@example.com
+
+SUMMARY
+Fourth-year commerce student who turns messy sales and survey data into decisions a team can act on. Comfortable with Excel, SQL and Tableau, and at ease presenting results to managers. Looking for a marketing analyst or business analyst role starting in May 2027.
+
+EXPERIENCE
+
+Marketing Analytics Co-op, Harbourline Credit Union, Halifax, NS · January 2026 to August 2026
+Built a monthly Tableau dashboard that tracked new member sign-ups by branch and campaign. The marketing director used it in her Monday planning meeting.
+Cleaned three years of campaign data in Excel and SQL, which cut report preparation from two days to half a day.
+Ran an email subject line test on 12,000 members that raised open rates from 21% to 27%.
+
+Sales Associate (part-time), Atlantic Outdoor Supply, Dartmouth, NS · May 2023 to December 2025
+Served 40 to 60 customers a shift and trained five new hires on the point-of-sale system.
+Proposed a weekend restocking schedule that the store manager adopted for all seasonal stock.
+
+EDUCATION
+
+Bachelor of Commerce, Saint Mary's University, Halifax · expected April 2027
+Major in Marketing, minor in Business Analytics. Dean's List in 2024 and 2025.
+Relevant courses: Marketing Research, Business Statistics, Database Fundamentals, Consumer Behaviour.
+
+SKILLS
+Data: Excel (pivot tables, XLOOKUP), SQL, Tableau, Google Analytics 4
+Marketing: A/B testing, survey design, email campaigns, social media reporting
+Languages: English, and conversational French
+
+VOLUNTEERING
+Volunteer Coordinator, Harbour City Food Bank student chapter · 2024 to present
+Schedules about 30 volunteers a month for weekend sorting shifts and tracks their hours in a shared spreadsheet.
+
+PROJECTS
+Campus Coffee Pricing Study · 2025
+Surveyed 310 students and used the results to recommend a price for a loyalty card. The student association adopted the recommendation for the fall 2025 term.
