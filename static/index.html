@@ -215,7 +215,7 @@
             <button type="submit">Ask</button>
         </form>
 
-        <div class="starters" aria-label="Example questions">
+        <div class="starters" role="group" aria-label="Example questions">
             <button type="button">What kind of role are they looking for?</button>
             <button type="button">What did they do in their most recent job?</button>
             <button type="button">What are they still learning?</button>
@@ -245,7 +245,7 @@
             a.textContent = 'Reading the documents...';
             entry.append(q, a);
             log.append(entry);
-            entry.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            entry.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
             return a;
         }
 
@@ -253,7 +253,7 @@
         function showSources(entry, sources) {
             const details = document.createElement('details');
             const summary = document.createElement('summary');
-            summary.textContent = 'Sources · ' + sources.length + ' passages';
+            summary.textContent = 'Sources · ' + sources.length + (sources.length === 1 ? ' passage' : ' passages');
             const list = document.createElement('ul');
             list.className = 'sources';
             sources.forEach(function (s) {
@@ -283,13 +283,14 @@
                 if (!response.ok || !data) {
                     throw new Error(data && typeof data.detail === 'string'
                         ? data.detail
-                        : 'The server did not answer. Free servers sleep when idle and take about a minute to wake. Try again shortly.');
+                        : 'The server did not answer (error ' + response.status + '). If the page sat idle, it may still be waking up, so try again in a minute.');
                 }
                 answer.textContent = data.answer;
                 answer.classList.remove('pending');
                 if (data.sources && data.sources.length) showSources(answer.parentElement, data.sources);
             } catch (error) {
-                answer.textContent = error.message.startsWith('Failed to fetch')
+                // Browsers word network failures differently, but they are always a TypeError
+                answer.textContent = error instanceof TypeError
                     ? 'Could not reach the server. Check your connection and try again.'
                     : error.message;
                 answer.className = 'a error';

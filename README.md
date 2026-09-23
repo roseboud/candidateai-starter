@@ -25,17 +25,38 @@ A small retrieval-augmented generation (RAG) app. It answers recruiters' questio
 
 ## Run on your laptop (optional)
 
-Needs Python 3.10 or newer.
+Needs Python 3.10 or newer. Open a terminal in the folder that holds `app.py`.
+
+Windows (PowerShell):
 
 ```
 python -m venv .venv
-.venv\Scripts\activate          (Windows)
-source .venv/bin/activate       (macOS or Linux)
-pip install -r requirements.txt
-copy .env.example .env          (Windows; use cp on macOS or Linux)
+.venv\Scripts\python -m pip install -r requirements.txt
+copy .env.example .env
 ```
 
-Open `.env`, paste your key, then run `uvicorn app:app --reload` and open http://127.0.0.1:8000.
+macOS or Linux:
+
+```
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+```
+
+Open `.env` and paste your key. Then start the app, and open http://127.0.0.1:8000 when it says it's running.
+
+Windows:
+
+```
+.venv\Scripts\python -m uvicorn app:app --reload
+```
+
+macOS or Linux:
+
+```
+uvicorn app:app --reload
+```
 
 ## Settings
 

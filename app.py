@@ -24,7 +24,7 @@ CANDIDATE_NAME = os.getenv("CANDIDATE_NAME", "Jordan Doucette")
 MODEL = os.getenv("MODEL", "google/gemini-3.1-flash-lite")
 USE_RETRIEVAL = os.getenv("USE_RETRIEVAL", "true").lower() == "true"
 TOP_K = 4                      # how many chunks to send with each question
-QUESTIONS_PER_MINUTE = 10      # per visitor, so one person can't spend the whole key
+QUESTIONS_PER_MINUTE = 20      # per visitor address, so one person can't spend the whole key
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 BASE_DIR = Path(__file__).parent
@@ -42,14 +42,22 @@ def load_documents():
     for name in ("resume.txt", "profile.txt"):
         path = BASE_DIR / "data" / name
         if path.exists():
-            documents[name] = path.read_text(encoding="utf-8-sig")
-    if not documents:
-        raise RuntimeError("No documents found. Add data/resume.txt.")
+            text = path.read_text(encoding="utf-8-sig", errors="replace").strip()
+            if text:
+                documents[name] = text
+    if "resume.txt" not in documents:
+        raise RuntimeError("data/resume.txt is missing or empty. Check the file name on GitHub.")
     return documents
 
 
-CHUNKS = build_chunks(load_documents())
+DOCUMENTS = load_documents()
+CHUNKS = build_chunks(DOCUMENTS)
 NAME_WORDS = tokenize(CANDIDATE_NAME)  # skipped when searching; see retrieval.py
+
+# These lines appear at the top of Render's log, so you can check what the app loaded
+print("Candidate:", CANDIDATE_NAME, "| loaded", ", ".join(f"{k} ({len(v)} characters)" for k, v in DOCUMENTS.items()), flush=True)
+if "CANDIDATE_NAME" not in os.environ:
+    print("CANDIDATE_NAME is not set, so the sample name is used. Add it in the Environment tab.", flush=True)
 PAGE = (BASE_DIR / "static" / "index.html").read_text(encoding="utf-8")
 PAGE = PAGE.replace("{{NAME}}", html.escape(CANDIDATE_NAME))
 
@@ -67,8 +75,10 @@ recent = defaultdict(list)  # visitor address -> times of their recent questions
 def too_many(visitor):
     now = time.time()
     recent[visitor] = [t for t in recent[visitor] if now - t < 60]
+    if len(recent[visitor]) >= QUESTIONS_PER_MINUTE:
+        return True  # refused questions aren't counted, so waiting a minute always works
     recent[visitor].append(now)
-    return len(recent[visitor]) > QUESTIONS_PER_MINUTE
+    return False
 
 
 # ---- Routes -------------------------------------------------------------------
@@ -121,8 +131,22 @@ def ask(body: Question, request: Request):
         print("OpenRouter said", reply.status_code, reply.text[:300], flush=True)
         raise HTTPException(502, f"The model service returned an error ({reply.status_code}).")
 
-    choices = reply.json().get("choices") or [{}]
-    answer = (choices[0].get("message") or {}).get("content") or "I couldn't produce an answer. Try asking another way."
+    try:
+        data = reply.json()
+    except ValueError:
+        print("OpenRouter sent a reply that isn't JSON:", reply.text[:300], flush=True)
+        raise HTTPException(502, "The model service sent an unexpected reply. Try again.")
+    if not isinstance(data, dict):
+        data = {}
+
+    # A request can fail after OpenRouter has already sent "200 OK", so look for an error in the body too
+    choice = (data.get("choices") or [{}])[0]
+    problem = data.get("error") or choice.get("error")
+    if problem:
+        print("OpenRouter error inside a 200 reply:", problem, flush=True)
+        raise HTTPException(502, "The model service had a problem. Try again in a moment.")
+
+    answer = (choice.get("message") or {}).get("content") or "I couldn't produce an answer. Try asking another way."
 
     return {
         "answer": answer.strip(),

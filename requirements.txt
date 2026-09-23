@@ -1,4 +1,6 @@
 fastapi==0.141.1
+starlette==1.7.0
+pydantic==2.13.5
 uvicorn==0.53.0
 requests==2.34.2
 python-dotenv==1.2.3
