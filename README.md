@@ -1,6 +1,8 @@
 # CandidateAI starter
 
-A small retrieval-augmented generation (RAG) app. It answers recruiters' questions about one person, using their resume and a short profile as its only source. Built for the *Building RAG from a Resume* workshop at Saint Mary's University.
+A small retrieval-augmented generation (RAG) app. It answers recruiters' questions about one person, using their resume and a short profile as its only source. It's the technical lane of [Building RAG from a Resume](https://quinan.tech/rag/), a free course from Quinan Labs, first taught at Saint Mary's University.
+
+The OpenRouter key lives in an environment variable on the server, never in the page. For paid models, every request asks OpenRouter to use only providers that keep nothing and don't train on what they receive.
 
 ## Files
 

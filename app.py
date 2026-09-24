@@ -115,11 +115,16 @@ def ask(body: Question, request: Request):
     ]
 
     # 3. Generate: send it all to the model through OpenRouter
+    payload = {"model": MODEL, "messages": messages, "max_tokens": 600, "temperature": 0.3}
+    if not MODEL.endswith(":free") and MODEL != "openrouter/free":
+        # Use only providers that keep nothing and don't train on what they receive.
+        # Most free models' providers do keep prompts, so the rule would block them.
+        payload["provider"] = {"zdr": True, "data_collection": "deny"}
     try:
         reply = requests.post(
             OPENROUTER_URL,
             headers={"Authorization": f"Bearer {key}"},
-            json={"model": MODEL, "messages": messages, "max_tokens": 600, "temperature": 0.3},
+            json=payload,
             timeout=45,
         )
     except requests.RequestException as error:
